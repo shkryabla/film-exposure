@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Тема Activity минимальна: всё оформление приложения задаётся в Compose (ui/theme/Theme.kt).
+         Экран камеры всегда тёмный независимо от системной темы (см. ТЗ §9), поэтому базовая
+         платформенная тема тоже тёмная, чтобы не было "мигания" светлым фоном при старте. -->
+    <style name="Theme.FilmExposure" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/ic_launcher_background</item>
+        <item name="android:statusBarColor">@color/ic_launcher_background</item>
+        <item name="android:navigationBarColor">@color/ic_launcher_background</item>
+    </style>
+</resources>

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "fomapan_200",
+      "name": "Fomapan Classic 200",
+      "brand": "Foma",
+      "iso": 200,
+      "type": "bw_negative",
+      "latitude": { "minus": 2, "plus": 2 },
+      "pushMax": 3,
+      "reciprocity": {
+        "threshold": 1.0,
+        "table": [
+          { "metered": 1, "actual": 1.5 },
+          { "metered": 2, "actual": 3 },
+          { "metered": 5, "actual": 10 },
+          { "metered": 10, "actual": 25 }
+        ]
+      }
+    }
+  ]
+}

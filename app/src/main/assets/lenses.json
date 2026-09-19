@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "helios_44_2",
+      "name": "Гелиос-44-2",
+      "brand": "КМЗ",
+      "country": "USSR",
+      "focalMin": 58,
+      "focalMax": 58,
+      "apertures": ["f/2", "f/2.8", "f/4", "f/5.6", "f/8", "f/11", "f/16"],
+      "minFocus": 0.5,
+      "mount": "M42",
+      "step": "full"
+    }
+  ]
+}

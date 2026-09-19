@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Плейсхолдер: стилизованная диафрагма. Заменить на финальную иконку перед релизом. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#8AB4F8"
+        android:pathData="M54,29 L66,40 L79,44 L79,58 L70,69 L66,81 L54,85 L42,81 L29,70 L29,56 L38,44 L42,32 Z" />
+    <path
+        android:fillColor="#121212"
+        android:pathData="M54,44 A10,10 0 1,0 54,64 A10,10 0 1,0 54,44 Z" />
+</vector>
