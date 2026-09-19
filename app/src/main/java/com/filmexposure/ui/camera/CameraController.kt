@@ -51,7 +51,7 @@ class CameraController(private val context: Context) {
             val provider = providerFuture.get()
 
             val preview = Preview.Builder().build().also {
-                it.surfaceProvider = previewView.surfaceProvider
+                it.setSurfaceProvider(previewView.surfaceProvider)
             }
 
             val analysisBuilder = ImageAnalysis.Builder()
