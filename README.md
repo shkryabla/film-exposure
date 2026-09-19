@@ -62,4 +62,4 @@ MIT — см. [LICENSE](LICENSE).
 
 ## Автор
 
-Mikhail
+shkryabla@gmail.com
