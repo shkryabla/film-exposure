@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RigRepository {
     fun observeAll(): Flow<List<Rig>>
+    suspend fun getById(rigId: Long): Rig?
     suspend fun upsert(rig: Rig): Long
     suspend fun delete(rigId: Long)
 }

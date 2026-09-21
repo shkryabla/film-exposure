@@ -14,6 +14,8 @@ class RigRepositoryImpl @Inject constructor(
 
     override fun observeAll(): Flow<List<Rig>> = dao.observeAll().map { list -> list.map { it.toDomain() } }
 
+    override suspend fun getById(rigId: Long): Rig? = dao.getById(rigId)?.toDomain()
+
     override suspend fun upsert(rig: Rig): Long {
         val now = System.currentTimeMillis()
         // REPLACE-стратегия физически удаляет и заново вставляет строку — без явного сохранения
@@ -24,6 +26,7 @@ class RigRepositoryImpl @Inject constructor(
             name = rig.name,
             cameraId = rig.cameraId,
             lensId = rig.lensId,
+            formatId = rig.formatId,
             activeSpeeds = rig.activeSpeeds.joinToString(";"),
             activeApertures = rig.activeApertures.joinToString(";"),
             focal = rig.focal,
@@ -41,6 +44,7 @@ class RigRepositoryImpl @Inject constructor(
         name = name,
         cameraId = cameraId,
         lensId = lensId,
+        formatId = formatId,
         activeSpeeds = activeSpeeds.split(";").map { it.trim() }.filter { it.isNotBlank() },
         activeApertures = activeApertures.split(";").map { it.trim() }.filter { it.isNotBlank() },
         focal = focal,

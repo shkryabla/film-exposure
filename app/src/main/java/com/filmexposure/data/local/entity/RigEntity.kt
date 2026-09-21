@@ -9,6 +9,7 @@ data class RigEntity(
     val name: String,
     val cameraId: String,
     val lensId: String,
+    val formatId: String,
     val activeSpeeds: String,
     val activeApertures: String,
     val focal: Int,

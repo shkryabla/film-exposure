@@ -22,7 +22,7 @@ import com.filmexposure.data.local.entity.SessionEntity
         RigEntity::class,
         SessionEntity::class,
     ],
-    version = 1,
+    version = 2, // v2: добавлено RigEntity.formatId (§6.3 — формат плёнки отдельным полем)
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

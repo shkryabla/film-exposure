@@ -26,7 +26,7 @@ class CalibrationViewModel @Inject constructor(
 
     fun saveCalibration(constant: Float, onSaved: () -> Unit) {
         viewModelScope.launch {
-            settingsRepository.update { it.copy(calibrationConstant = constant) }
+            settingsRepository.update { it.copy(calibrationConstant = constant, isCalibrated = true) }
             onSaved()
         }
     }
