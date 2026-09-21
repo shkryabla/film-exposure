@@ -17,6 +17,7 @@ data class CameraSpecJson(
     val speeds: List<String>,
     val xSync: String?,
     val step: String,
+    val notes: String? = null,
 )
 
 data class LensSpecJson(

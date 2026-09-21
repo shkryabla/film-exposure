@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -31,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-/** Список ригов (§6.2 "Мои риги"). Тап по ригу — выбрать для съёмки, иконка корзины — удалить. */
+/** Список ригов (§6.2 "Мои риги"). Тап по карточке — выбрать для съёмки; карандаш — редактировать, корзина — удалить. */
 @Composable
 fun RigListScreen(
     onBack: () -> Unit,
@@ -78,8 +79,10 @@ fun RigListScreen(
                 val isSelected = rig.id == selectedRigId
 
                 Card(
+                    // Тап по карточке — выбрать риг для съёмки (первичное действие в списке-пикере).
+                    // Редактирование и удаление — отдельные явные иконки, не спрятаны за жестами.
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
-                        .clickable { onEditRig(rig.id) },
+                        .clickable { viewModel.selectRig(rig.id) },
                     colors = CardDefaults.cardColors(
                         containerColor = if (isSelected) {
                             MaterialTheme.colorScheme.primaryContainer
@@ -94,14 +97,20 @@ fun RigListScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(rig.name, style = MaterialTheme.typography.titleMedium)
-                            androidx.compose.foundation.layout.Row {
+                            androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
                                 if (isSelected) {
                                     Icon(
                                         Icons.Filled.CheckCircle,
                                         contentDescription = "Выбран для съёмки",
                                         tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(end = 6.dp),
                                     )
+                                }
+                                Text(rig.name, style = MaterialTheme.typography.titleMedium)
+                            }
+                            androidx.compose.foundation.layout.Row {
+                                IconButton(onClick = { onEditRig(rig.id) }) {
+                                    Icon(Icons.Filled.Edit, contentDescription = "Редактировать")
                                 }
                                 IconButton(onClick = { viewModel.deleteRig(rig.id) }) {
                                     Icon(Icons.Filled.Delete, contentDescription = "Удалить")
@@ -113,15 +122,6 @@ fun RigListScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        if (!isSelected) {
-                            Text(
-                                "Нажмите, чтобы открыть, или удержите для выбора",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 4.dp)
-                                    .clickable { viewModel.selectRig(rig.id) },
-                            )
-                        }
                     }
                 }
             }

@@ -65,6 +65,14 @@ fun CameraListScreen(
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        if (!camera.notes.isNullOrBlank()) {
+                            Text(
+                                camera.notes,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 2.dp),
+                            )
+                        }
                     }
                 }
             }

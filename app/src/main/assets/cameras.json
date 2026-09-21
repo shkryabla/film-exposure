@@ -1,16 +1,27 @@
 {
   "version": 1,
   "items": [
-    {
-      "id": "zenit_e",
-      "name": "Зенит-Е",
-      "brand": "КМЗ",
-      "country": "USSR",
-      "format": "35mm",
-      "shutterType": "focal_plane",
-      "speeds": ["B", "1/30", "1/60", "1/125", "1/250", "1/500"],
-      "xSync": "1/30",
-      "step": "full"
-    }
+    {"id":"zenit_e","name":"Зенит-Е","brand":"КМЗ","country":"USSR","format":"35mm","shutterType":"focal_plane","speeds":["B","1/30","1/60","1/125","1/250","1/500"],"xSync":"1/30","step":"full"},
+    {"id":"zenit_12sd","name":"Зенит-12СД","brand":"КМЗ","country":"USSR","format":"35mm","shutterType":"focal_plane","speeds":["B","1/30","1/60","1/125","1/250","1/500"],"xSync":"1/30","step":"full"},
+    {"id":"kiev_88","name":"Киев-88","brand":"Арсенал","country":"USSR","format":"6x6","shutterType":"focal_plane","speeds":["B","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/30","step":"full"},
+    {"id":"kiev_6s","name":"Киев-6С","brand":"Арсенал","country":"USSR","format":"6x6","shutterType":"focal_plane","speeds":["B","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/30","step":"full"},
+    {"id":"fed_5","name":"ФЭД-5","brand":"ФЭД","country":"USSR","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500"],"xSync":"1/30","step":"full"},
+    {"id":"zorki_4","name":"Зоркий-4","brand":"КМЗ","country":"USSR","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/5","1/10","1/25","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/30","step":"full"},
+    {"id":"smena_8m","name":"Смена-8М","brand":"ЛОМО","country":"USSR","format":"35mm","shutterType":"leaf","speeds":["B","1/15","1/30","1/60","1/125","1/250"],"xSync":"1/60","step":"full","notes":"Несменный объектив Т-43 4/40 — для рига нужен собственный custom-объектив"},
+    {"id":"moskva_5","name":"Москва-5","brand":"КМЗ","country":"USSR","format":"6x6","shutterType":"leaf","speeds":["B","1","1/2","1/5","1/10","1/25","1/50","1/100","1/250"],"xSync":null,"step":"full","notes":"Листовой затвор «Момент-24С» — синхронизация на всех выдержках. Несменный Индустар-24 3.5/105. Нативный кадр камеры 6×9 (переключается на 6×6 маской) — в справочнике форматов (§5.1, 6 форматов по ТЗ) 6×9 нет, для ГРИП используется CoC формата 6×6, что чуть занижает реальную глубину резкости для полного кадра 6×9"},
+    {"id":"lomo_lka","name":"ЛОМО Компакт-Автомат","brand":"ЛОМО","country":"USSR","format":"35mm","shutterType":"leaf","speeds":["1/60"],"xSync":"1/60","step":"full","notes":"Автоматический затвор-диафрагма (программный AE); вручную доступна только 1/60. Несменный Минитар-1 2.8/32 — для рига нужен собственный custom-объектив"},
+    {"id":"nikon_fm2","name":"Nikon FM2","brand":"Nikon","country":"Japan","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000","1/2000","1/4000"],"xSync":"1/250","step":"full"},
+    {"id":"nikon_f3","name":"Nikon F3","brand":"Nikon","country":"Japan","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000","1/2000"],"xSync":"1/80","step":"full"},
+    {"id":"canon_ae1","name":"Canon AE-1","brand":"Canon","country":"Japan","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/60","step":"full"},
+    {"id":"canon_a1","name":"Canon A-1","brand":"Canon","country":"Japan","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/60","step":"full"},
+    {"id":"pentax_k1000","name":"Pentax K1000","brand":"Pentax","country":"Japan","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/60","step":"full"},
+    {"id":"pentax_me_super","name":"Pentax ME Super","brand":"Pentax","country":"Japan","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000","1/2000"],"xSync":"1/125","step":"full"},
+    {"id":"olympus_om1","name":"Olympus OM-1","brand":"Olympus","country":"Japan","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/60","step":"full"},
+    {"id":"leica_m3","name":"Leica M3","brand":"Leica","country":"Germany","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/50","step":"full"},
+    {"id":"leica_m6","name":"Leica M6","brand":"Leica","country":"Germany","format":"35mm","shutterType":"focal_plane","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500","1/1000"],"xSync":"1/50","step":"full"},
+    {"id":"hasselblad_500cm","name":"Hasselblad 500C/M","brand":"Hasselblad","country":"Sweden","format":"6x6","shutterType":"leaf","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500"],"xSync":null,"step":"full","notes":"Листовой затвор в объективе — синхронизация на всех выдержках"},
+    {"id":"rolleiflex_35f","name":"Rolleiflex 3.5F","brand":"Franke & Heidecke","country":"Germany","format":"6x6","shutterType":"leaf","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500"],"xSync":null,"step":"full","notes":"Несменный объектив 75/3.5 — листовой затвор, синхронизация на всех выдержках"},
+    {"id":"yashica_mat_124g","name":"Yashica Mat-124G","brand":"Yashica","country":"Japan","format":"6x6","shutterType":"leaf","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/500"],"xSync":null,"step":"full","notes":"Несменный объектив 80/3.5 — листовой затвор, синхронизация на всех выдержках"},
+    {"id":"mamiya_rb67","name":"Mamiya RB67","brand":"Mamiya","country":"Japan","format":"6x7","shutterType":"leaf","speeds":["B","1","1/2","1/4","1/8","1/15","1/30","1/60","1/125","1/250","1/400"],"xSync":null,"step":"full","notes":"Листовой затвор в объективах Mamiya-Sekor — синхронизация на всех выдержках"}
   ]
 }

@@ -27,6 +27,7 @@ class CameraRepositoryImpl @Inject constructor(
                 xSync = spec.xSync,
                 step = spec.step,
                 isCustom = false,
+                notes = spec.notes,
             )
         }
         val custom = dao.getAll().map { it.toDomain() }

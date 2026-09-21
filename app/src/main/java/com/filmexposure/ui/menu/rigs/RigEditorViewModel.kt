@@ -10,6 +10,7 @@ import com.filmexposure.domain.repository.CameraRepository
 import com.filmexposure.domain.repository.FormatRepository
 import com.filmexposure.domain.repository.LensRepository
 import com.filmexposure.domain.repository.RigRepository
+import com.filmexposure.domain.repository.SettingsRepository
 import com.filmexposure.domain.usecase.ParseTechnicalListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,6 +48,7 @@ class RigEditorViewModel @Inject constructor(
     private val lensRepository: LensRepository,
     private val formatRepository: FormatRepository,
     private val parseList: ParseTechnicalListUseCase,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RigEditorState())
@@ -117,7 +119,7 @@ class RigEditorViewModel @Inject constructor(
         val s = _state.value
         if (!s.isValid) return
         viewModelScope.launch {
-            rigRepository.upsert(
+            val savedId = rigRepository.upsert(
                 Rig(
                     id = s.rigId,
                     name = s.name,
@@ -130,6 +132,9 @@ class RigEditorViewModel @Inject constructor(
                     notes = s.notes,
                 ),
             )
+            // Сохранённый риг сразу используется на главном экране — иначе выбор камеры/объектива
+            // здесь никак не применяется, пока пользователь отдельно не выберет риг в списке.
+            settingsRepository.update { it.copy(selectedRigId = savedId) }
             _state.update { it.copy(isSaved = true) }
         }
     }
