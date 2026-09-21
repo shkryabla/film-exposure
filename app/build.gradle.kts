@@ -42,7 +42,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions {
+        jvmTarget = "17"
+        // TopAppBar, ExposedDropdownMenuBox и другие M3-виджеты помечены экспериментальными
+        // и используются во множестве экранов меню — глобальный opt-in проще и надёжнее,
+        // чем @OptIn на каждой composable-функции по отдельности.
+        freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+    }
     buildFeatures { compose = true }
     composeOptions { kotlinCompilerExtensionVersion = "1.5.14" }
 }

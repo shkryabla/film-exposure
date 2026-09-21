@@ -66,7 +66,7 @@ fun CustomCameraScreen(onBack: () -> Unit, viewModel: CustomCameraViewModel = hi
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = formatExpanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor(),
                 )
-                androidx.compose.material3.ExposedDropdownMenu(expanded = formatExpanded, onDismissRequest = { formatExpanded = false }) {
+                ExposedDropdownMenu(expanded = formatExpanded, onDismissRequest = { formatExpanded = false }) {
                     state.formats.forEach { format: FilmFormat ->
                         DropdownMenuItem(text = { Text(format.name) }, onClick = { viewModel.setFormat(format); formatExpanded = false })
                     }
