@@ -2,26 +2,23 @@ package com.filmexposure.ui.menu.catalog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -36,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.filmexposure.domain.model.FilmFormat
+import com.filmexposure.ui.common.InfoLabel
 
 @Composable
 fun CustomCameraScreen(onBack: () -> Unit, viewModel: CustomCameraViewModel = hiltViewModel()) {
@@ -73,37 +71,18 @@ fun CustomCameraScreen(onBack: () -> Unit, viewModel: CustomCameraViewModel = hi
                 }
             }
 
-            Text("Тип затвора")
-            Row {
-                SHUTTER_TYPES.forEach { type ->
-                    Row(
-                        modifier = Modifier.selectable(selected = state.shutterType == type, onClick = { viewModel.setShutterType(type) }),
-                    ) {
-                        RadioButton(selected = state.shutterType == type, onClick = { viewModel.setShutterType(type) })
-                        Text(type)
-                    }
-                }
-            }
-
+            InfoLabel(
+                label = "Выдержки",
+                explanation = "Полный список выдержек, которые умеет отрабатывать затвор камеры. " +
+                    "Через точку с запятой: например 1; 1/2; 1/4; 1/125. «B» — режим Bulb (ручная выдержка).",
+            )
             OutlinedTextField(
                 value = state.speedsInput,
                 onValueChange = viewModel::setSpeedsInput,
-                label = { Text("Выдержки (через ;)") },
+                label = { Text("через ;") },
                 modifier = Modifier.fillMaxWidth(),
             )
             PreviewChips(viewModel.parsedSpeedsPreview())
-
-            OutlinedTextField(state.xSync, viewModel::setXSync, label = { Text("X-sync (опционально)") }, modifier = Modifier.fillMaxWidth())
-
-            Text("Шаг")
-            Row {
-                TECH_STEPS.forEach { step ->
-                    Row(modifier = Modifier.selectable(selected = state.step == step, onClick = { viewModel.setStep(step) })) {
-                        RadioButton(selected = state.step == step, onClick = { viewModel.setStep(step) })
-                        Text(step)
-                    }
-                }
-            }
 
             OutlinedTextField(state.notes, viewModel::setNotes, label = { Text("Заметки") }, modifier = Modifier.fillMaxWidth())
 

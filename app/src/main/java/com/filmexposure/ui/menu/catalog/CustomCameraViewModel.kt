@@ -15,16 +15,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-val SHUTTER_TYPES = listOf("focal_plane", "leaf")
-val TECH_STEPS = listOf("full", "half", "third")
+/**
+ * Тип затвора, X-sync и шаг диафрагмы/выдержки сейчас нигде не участвуют в расчётах и не
+ * показываются в справочнике — не просим пользователя их вводить, дефолтим тихо (наиболее
+ * частый случай для фотоаппарата с фокальным затвором и полными ступенями).
+ */
+private const val DEFAULT_SHUTTER_TYPE = "focal_plane"
+private const val DEFAULT_STEP = "full"
 
 data class CustomCameraState(
     val name: String = "",
     val formatId: String? = null,
-    val shutterType: String = SHUTTER_TYPES.first(),
     val speedsInput: String = "",
-    val xSync: String = "",
-    val step: String = TECH_STEPS.first(),
     val notes: String = "",
     val formats: List<FilmFormat> = emptyList(),
     val isSaved: Boolean = false,
@@ -48,10 +50,7 @@ class CustomCameraViewModel @Inject constructor(
 
     fun setName(v: String) = _state.update { it.copy(name = v) }
     fun setFormat(v: FilmFormat) = _state.update { it.copy(formatId = v.id) }
-    fun setShutterType(v: String) = _state.update { it.copy(shutterType = v) }
     fun setSpeedsInput(v: String) = _state.update { it.copy(speedsInput = v) }
-    fun setXSync(v: String) = _state.update { it.copy(xSync = v) }
-    fun setStep(v: String) = _state.update { it.copy(step = v) }
     fun setNotes(v: String) = _state.update { it.copy(notes = v) }
 
     fun parsedSpeedsPreview(): List<String> = parseList.parseSpeeds(_state.value.speedsInput)
@@ -66,10 +65,10 @@ class CustomCameraViewModel @Inject constructor(
                     name = s.name,
                     brand = null,
                     formatId = s.formatId!!,
-                    shutterType = s.shutterType,
+                    shutterType = DEFAULT_SHUTTER_TYPE,
                     speeds = parsedSpeedsPreview(),
-                    xSync = s.xSync.ifBlank { null },
-                    step = s.step,
+                    xSync = null,
+                    step = DEFAULT_STEP,
                     isCustom = true,
                     notes = s.notes,
                 ),

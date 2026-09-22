@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.filmexposure.ui.common.InfoLabel
 
 @Composable
 fun CustomLensScreen(onBack: () -> Unit, viewModel: CustomLensViewModel = hiltViewModel()) {
@@ -53,8 +54,12 @@ fun CustomLensScreen(onBack: () -> Unit, viewModel: CustomLensViewModel = hiltVi
             )
             PreviewChips(viewModel.parsedAperturesPreview())
 
+            InfoLabel(
+                label = "МДФ",
+                explanation = "Минимальная дистанция фокусировки — ближе этого расстояния объектив " +
+                    "не наводится на резкость. Указывается в метрах.",
+            )
             OutlinedTextField(state.minFocusInput, viewModel::setMinFocus, label = { Text("МДФ (м)") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(state.mount, viewModel::setMount, label = { Text("Байонет (опционально)") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(state.notes, viewModel::setNotes, label = { Text("Заметки") }, modifier = Modifier.fillMaxWidth())
 
             Button(onClick = viewModel::save, enabled = state.isValid, modifier = Modifier.fillMaxWidth()) { Text("Сохранить") }

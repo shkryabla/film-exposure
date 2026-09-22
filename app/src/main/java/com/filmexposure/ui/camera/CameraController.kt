@@ -36,7 +36,14 @@ class CameraController(private val context: Context) {
     @Volatile private var latestIso: Int = 0
     @Volatile private var latestAperture: Float = 0f
 
-    val previewView: PreviewView by lazy { PreviewView(context) }
+    // COMPATIBLE (TextureView) вместо дефолтного PERFORMANCE (SurfaceView): PreviewView лежит
+    // в Compose-стеке вместе с оверлеями (сетка, маркеры, крестик) и ЧБ-эффектом через saveLayer —
+    // SurfaceView рендерится отдельным аппаратным оверлеем в обход обычной композиции и даёт
+    // дёрганую/мерцающую картинку в такой связке. COMPATIBLE рендерит через обычный GPU-путь,
+    // официально рекомендован Google именно для случаев с трансформациями/эффектами поверх превью.
+    val previewView: PreviewView by lazy {
+        PreviewView(context).apply { implementationMode = PreviewView.ImplementationMode.COMPATIBLE }
+    }
 
     private val _frame = MutableStateFlow<LuminanceFrame?>(null)
     val frame: StateFlow<LuminanceFrame?> = _frame

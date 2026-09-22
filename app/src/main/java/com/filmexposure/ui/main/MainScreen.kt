@@ -83,7 +83,7 @@ fun MainScreen(onOpenMenu: () -> Unit, viewModel: MainViewModel = hiltViewModel(
                 val exposureColumn: @Composable () -> Unit = {
                     Column(modifier = Modifier.fillMaxHeight().weight(1f)) {
                         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                            CameraPreview(controller, modifier = Modifier.fillMaxSize())
+                            CameraPreview(controller, isBW = settings.isBW, modifier = Modifier.fillMaxSize())
 
                             if (settings.showRuleOfThirds) {
                                 RuleOfThirdsOverlay(
@@ -92,7 +92,10 @@ fun MainScreen(onOpenMenu: () -> Unit, viewModel: MainViewModel = hiltViewModel(
                                 )
                             }
                             CrosshairOverlay(modifier = Modifier.fillMaxSize())
-                            MeterMarkersOverlay(meterPoints, modifier = Modifier.fillMaxSize())
+                            // meterPoints хранит точки с category=MID как плейсхолдер (реальная
+                            // категоризация — только в postingResult, §4.5); до 2 точек результата
+                            // ещё нет — тогда рисуем как есть (единственная точка и правда MID).
+                            MeterMarkersOverlay(postingResult?.points ?: meterPoints, modifier = Modifier.fillMaxSize())
 
                             PointsCounter(
                                 count = meterPoints.size,

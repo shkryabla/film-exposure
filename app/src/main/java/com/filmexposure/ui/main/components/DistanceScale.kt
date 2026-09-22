@@ -52,7 +52,7 @@ fun DistanceScale(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 listOf("∞", "20", "10", "5", "3", "2", "1", "0.5").forEach { tick ->
-                    Text(tick, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(tick, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }

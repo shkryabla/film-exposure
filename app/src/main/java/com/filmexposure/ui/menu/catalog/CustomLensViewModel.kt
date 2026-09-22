@@ -13,14 +13,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** Байонет и шаг диафрагмы сейчас нигде не участвуют в расчётах — не просим вводить, дефолтим. */
+private const val DEFAULT_STEP = "full"
+
 data class CustomLensState(
     val name: String = "",
     val focalMinInput: String = "",
     val focalMaxInput: String = "",
     val aperturesInput: String = "",
     val minFocusInput: String = "",
-    val mount: String = "",
-    val step: String = TECH_STEPS.first(),
     val notes: String = "",
     val isSaved: Boolean = false,
 ) {
@@ -44,8 +45,6 @@ class CustomLensViewModel @Inject constructor(
     fun setFocalMax(v: String) = _state.update { it.copy(focalMaxInput = v.filter { c -> c.isDigit() }) }
     fun setAperturesInput(v: String) = _state.update { it.copy(aperturesInput = v) }
     fun setMinFocus(v: String) = _state.update { it.copy(minFocusInput = v.filter { c -> c.isDigit() || c == '.' }) }
-    fun setMount(v: String) = _state.update { it.copy(mount = v) }
-    fun setStep(v: String) = _state.update { it.copy(step = v) }
     fun setNotes(v: String) = _state.update { it.copy(notes = v) }
 
     fun parsedAperturesPreview(): List<String> = parseList.parseApertures(_state.value.aperturesInput)
@@ -63,8 +62,8 @@ class CustomLensViewModel @Inject constructor(
                     focalMax = s.focalMaxInput.toInt(),
                     apertures = parsedAperturesPreview(),
                     minFocus = s.minFocusInput.toFloat(),
-                    mount = s.mount.ifBlank { null },
-                    step = s.step,
+                    mount = null,
+                    step = DEFAULT_STEP,
                     isCustom = true,
                     notes = s.notes,
                 ),

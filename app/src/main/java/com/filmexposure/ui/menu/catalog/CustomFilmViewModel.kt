@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-val FILM_TYPES = listOf("bw_negative", "color_negative", "slide")
+/** Тип плёнки и макс. пуш сейчас нигде не используются (ни в расчётах, ни в отображении) — не просим вводить. */
+private const val DEFAULT_TYPE = "bw_negative"
+private const val DEFAULT_PUSH_MAX = 0
 
 data class CustomFilmState(
     val name: String = "",
     val isoInput: String = "",
-    val type: String = FILM_TYPES.first(),
     val latitudeMinusInput: String = "2",
     val latitudePlusInput: String = "2",
-    val pushMaxInput: String = "0",
     val notes: String = "",
     val isSaved: Boolean = false,
 ) {
@@ -43,10 +43,8 @@ class CustomFilmViewModel @Inject constructor(
 
     fun setName(v: String) = _state.update { it.copy(name = v) }
     fun setIso(v: String) = _state.update { it.copy(isoInput = v.filter { c -> c.isDigit() }) }
-    fun setType(v: String) = _state.update { it.copy(type = v) }
     fun setLatitudeMinus(v: String) = _state.update { it.copy(latitudeMinusInput = v.filter { c -> c.isDigit() }) }
     fun setLatitudePlus(v: String) = _state.update { it.copy(latitudePlusInput = v.filter { c -> c.isDigit() }) }
-    fun setPushMax(v: String) = _state.update { it.copy(pushMaxInput = v.filter { c -> c.isDigit() }) }
     fun setNotes(v: String) = _state.update { it.copy(notes = v) }
 
     fun save() {
@@ -59,10 +57,10 @@ class CustomFilmViewModel @Inject constructor(
                     name = s.name,
                     brand = null,
                     iso = s.isoInput.toInt(),
-                    type = s.type,
+                    type = DEFAULT_TYPE,
                     latitudeMinus = s.latitudeMinusInput.toIntOrNull() ?: 2,
                     latitudePlus = s.latitudePlusInput.toIntOrNull() ?: 2,
-                    pushMax = s.pushMaxInput.toIntOrNull() ?: 0,
+                    pushMax = DEFAULT_PUSH_MAX,
                     reciprocity = ReciprocityTable(threshold = 1f, points = emptyList()),
                     isCustom = true,
                     notes = s.notes,
