@@ -34,7 +34,7 @@ import com.filmexposure.ui.camera.rememberCameraController
 import com.filmexposure.ui.main.components.BwToggle
 import com.filmexposure.ui.main.components.CrosshairOverlay
 import com.filmexposure.ui.main.components.DistanceScale
-import com.filmexposure.ui.main.components.ExposurePairsRow
+import com.filmexposure.ui.main.components.ExposureDial
 import com.filmexposure.ui.main.components.MeterMarkersOverlay
 import com.filmexposure.ui.main.components.PauseButton
 import com.filmexposure.ui.main.components.PointsCounter
@@ -130,11 +130,11 @@ fun MainScreen(onOpenMenu: () -> Unit, viewModel: MainViewModel = hiltViewModel(
                             modifier = Modifier.fillMaxWidth().height(72.dp),
                         )
 
-                        ExposurePairsRow(
+                        ExposureDial(
                             pairs = validPairs,
                             selectedIndex = selectedPairIndex,
                             onSelect = viewModel::selectPairIndex,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         )
                     }
                 }
