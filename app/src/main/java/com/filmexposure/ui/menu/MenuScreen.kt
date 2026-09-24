@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lens
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -21,18 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 
-/**
- * Меню (§6.2) — полноэкранный диалог с 6 секциями. Навигация к подэкранам — через колбэки,
- * реальный NavHost-роутинг подключается в FilmExposureRoot.
- */
+/** Меню (§6.2) — теперь три секции: Профили, Настройки, О программе. */
 @Composable
 fun MenuScreen(
     onBack: () -> Unit,
-    onOpenRigs: () -> Unit,
-    onOpenCameras: () -> Unit,
-    onOpenLenses: () -> Unit,
-    onOpenFilms: () -> Unit,
+    onOpenProfiles: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenAbout: () -> Unit,
 ) {
@@ -46,13 +39,7 @@ fun MenuScreen(
                     }
                 },
             )
-            MenuRow("Мои риги", Icons.Filled.PhotoCamera, onOpenRigs)
-            HorizontalDivider()
-            MenuRow("Камеры", Icons.Filled.CameraAlt, onOpenCameras)
-            HorizontalDivider()
-            MenuRow("Объективы", Icons.Filled.Lens, onOpenLenses)
-            HorizontalDivider()
-            MenuRow("Плёнки", Icons.Filled.PhotoCamera, onOpenFilms)
+            MenuRow("Профили", Icons.Filled.AccountBox, onOpenProfiles)
             HorizontalDivider()
             MenuRow("Настройки", Icons.Filled.Settings, onOpenSettings)
             HorizontalDivider()
@@ -62,7 +49,7 @@ fun MenuScreen(
 }
 
 @Composable
-private fun MenuRow(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+private fun MenuRow(title: String, icon: ImageVector, onClick: () -> Unit) {
     ListItem(
         headlineContent = { Text(title, style = MaterialTheme.typography.bodyLarge) },
         leadingContent = { Icon(icon, contentDescription = null) },

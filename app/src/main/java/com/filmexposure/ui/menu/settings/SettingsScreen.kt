@@ -30,7 +30,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.filmexposure.domain.model.ButtonSide
 import com.filmexposure.domain.model.DistanceUnit
-import com.filmexposure.domain.model.ScaleMode
 
 @Composable
 fun SettingsScreen(
@@ -61,25 +60,7 @@ fun SettingsScreen(
             )
             HorizontalDivider()
 
-            SectionLabel("Точек замера")
-            SingleChoiceRow(
-                options = listOf(1, 2, 3),
-                selected = settings.meteringPoints,
-                label = { it.toString() },
-                onSelect = viewModel::setMeteringPoints,
-            )
-            HorizontalDivider()
-
-            SectionLabel("Режим шкалы стопов")
-            SingleChoiceRow(
-                options = ScaleMode.entries,
-                selected = settings.scaleMode,
-                label = { if (it == ScaleMode.SIMPLE) "Simple" else "Pro" },
-                onSelect = viewModel::setScaleMode,
-            )
-            HorizontalDivider()
-
-            SectionLabel("Сторона кнопки паузы")
+            SectionLabel("Сторона кнопки \"Зафиксировать\"")
             SingleChoiceRow(
                 options = ButtonSide.entries,
                 selected = settings.pauseButtonSide,
@@ -88,10 +69,14 @@ fun SettingsScreen(
             )
             HorizontalDivider()
 
-            SwitchRow("Сетка третей", settings.showRuleOfThirds, viewModel::setShowRuleOfThirds)
-            SwitchRow("Точки пересечений сетки", settings.showIntersections, viewModel::setShowIntersections)
-            SwitchRow("Зональная заливка", settings.showZoneOverlay, viewModel::setShowZoneOverlay)
-            SwitchRow("Чёрно-белое превью", settings.isBW, viewModel::setBW)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Чёрно-белое превью", style = MaterialTheme.typography.bodyLarge)
+                Switch(checked = settings.isBW, onCheckedChange = viewModel::setBW)
+            }
 
             HorizontalDivider()
             SectionLabel("Калибровка")
@@ -114,18 +99,6 @@ fun SettingsScreen(
 @Composable
 private fun SectionLabel(text: String) {
     Text(text, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
-}
-
-@Composable
-private fun SwitchRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyLarge)
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
-    }
 }
 
 @Composable

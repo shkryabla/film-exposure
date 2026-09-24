@@ -53,9 +53,9 @@ fun ExposureDial(
     if (pairs.isEmpty()) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Text(
-                "Нет пар под текущий Ev в активном наборе рига",
+                "Нет пар под текущий Ev в профиле",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = Color.White.copy(alpha = 0.6f),
             )
         }
         return
@@ -75,7 +75,7 @@ fun ExposureDial(
     val pxPerItem = with(density) { 56.dp.toPx() } // сколько пикселей драга = один шаг ленты
 
     val highlightColor = MaterialTheme.colorScheme.primary
-    val normalColor = MaterialTheme.colorScheme.onSurface
+    val normalColor = Color.White.copy(alpha = 0.6f)
 
     Column(
         modifier = modifier.pointerInput(pairs.size) {
@@ -99,7 +99,7 @@ fun ExposureDial(
             normalColor = normalColor,
             modifier = Modifier.fillMaxWidth().height(48.dp),
         )
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = Color.White.copy(alpha = 0.15f))
         CoinEdgeReel(
             labels = pairs.map { it.shutter },
             continuousIndex = continuousIndex,

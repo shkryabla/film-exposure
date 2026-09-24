@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.filmexposure.domain.model.AppSettings
 import com.filmexposure.domain.model.ButtonSide
 import com.filmexposure.domain.model.DistanceUnit
-import com.filmexposure.domain.model.ScaleMode
 import com.filmexposure.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,11 +22,6 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
 
     fun setDistanceUnit(unit: DistanceUnit) = update { it.copy(distanceUnit = unit) }
-    fun setMeteringPoints(points: Int) = update { it.copy(meteringPoints = points.coerceIn(1, 3)) }
-    fun setScaleMode(mode: ScaleMode) = update { it.copy(scaleMode = mode) }
-    fun setShowRuleOfThirds(value: Boolean) = update { it.copy(showRuleOfThirds = value) }
-    fun setShowIntersections(value: Boolean) = update { it.copy(showIntersections = value) }
-    fun setShowZoneOverlay(value: Boolean) = update { it.copy(showZoneOverlay = value) }
     fun setPauseButtonSide(side: ButtonSide) = update { it.copy(pauseButtonSide = side) }
     fun setBW(value: Boolean) = update { it.copy(isBW = value) }
 

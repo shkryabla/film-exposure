@@ -5,18 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.filmexposure.domain.model.AppSettings
 import com.filmexposure.domain.model.DofResult
 import com.filmexposure.domain.model.ExposurePair
-import com.filmexposure.domain.model.ExposurePosting
-import com.filmexposure.domain.model.ExposurePostingResult
-import com.filmexposure.domain.model.MeterPoint
-import com.filmexposure.domain.model.PointCategory
-import com.filmexposure.domain.model.ScaleMode
-import com.filmexposure.domain.repository.FilmRepository
+import com.filmexposure.domain.model.Profile
 import com.filmexposure.domain.repository.FormatRepository
-import com.filmexposure.domain.repository.RigRepository
+import com.filmexposure.domain.repository.ProfileRepository
 import com.filmexposure.domain.repository.SettingsRepository
 import com.filmexposure.domain.usecase.CalculateBvUseCase
 import com.filmexposure.domain.usecase.CalculateDofUseCase
-import com.filmexposure.domain.usecase.CalculateExposurePostingUseCase
 import com.filmexposure.domain.usecase.CalculateValidPairsUseCase
 import com.filmexposure.domain.usecase.ParseTechnicalListUseCase
 import com.filmexposure.ui.camera.LuminanceFrame
@@ -30,18 +24,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.hypot
 
-private const val MARKER_HIT_RADIUS_PX = 60f
+/** Не чаще раза в ~200мс пересчитываем Ev — иначе живой замер дёргается от шума сенсора кадр в кадр. */
+private const val LIVE_UPDATE_THROTTLE_MS = 200L
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val rigRepository: RigRepository,
+    private val profileRepository: ProfileRepository,
     private val formatRepository: FormatRepository,
-    private val filmRepository: FilmRepository,
     private val calculateBv: CalculateBvUseCase,
-    private val calculatePosting: CalculateExposurePostingUseCase,
     private val calculatePairs: CalculateValidPairsUseCase,
     private val calculateDof: CalculateDofUseCase,
     private val parseList: ParseTechnicalListUseCase,
@@ -50,21 +42,23 @@ class MainViewModel @Inject constructor(
     val settings: StateFlow<AppSettings> = settingsRepository.settings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
 
-    /** Реальный риг+плёнка из меню (§6.2/§6.3), если выбраны; иначе MockRig-заглушка. */
-    val rigContext: StateFlow<RigContext> = settings
-        .map { it.selectedRigId to it.selectedFilmId }
+    /** Активный профиль (§6.2 "Профили"); null — профиль не выбран, замер невозможен. */
+    val activeProfile: StateFlow<Profile?> = settings
+        .map { it.selectedProfileId }
         .distinctUntilChanged()
-        .map { (rigId, filmId) -> loadRigContext(rigId, filmId) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RigContext.mock())
+        .map { id -> id?.let { profileRepository.getById(it) } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    private val _meterPoints = MutableStateFlow<List<MeterPoint>>(emptyList())
-    val meterPoints: StateFlow<List<MeterPoint>> = _meterPoints
+    private val _isFrozen = MutableStateFlow(false)
+    val isFrozen: StateFlow<Boolean> = _isFrozen
 
-    private val _posting = MutableStateFlow(ExposurePosting.BALANCE)
-    val posting: StateFlow<ExposurePosting> = _posting
+    private val _liveEv = MutableStateFlow<Float?>(null)
+    private val _frozenEv = MutableStateFlow<Float?>(null)
 
-    private val _evShift = MutableStateFlow(0f)
-    val evShift: StateFlow<Float> = _evShift
+    /** Текущий Ev: живой, пока не зафиксировано; после "Зафиксировать" — заморожен вместе с кадром. */
+    val currentEv: StateFlow<Float?> = combine(_isFrozen, _liveEv, _frozenEv) { frozen, live, frozenVal ->
+        if (frozen) frozenVal else live
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val _selectedPairIndex = MutableStateFlow(0)
     val selectedPairIndex: StateFlow<Int> = _selectedPairIndex
@@ -72,40 +66,36 @@ class MainViewModel @Inject constructor(
     private val _focusDistanceM = MutableStateFlow(3f)
     val focusDistanceM: StateFlow<Float> = _focusDistanceM
 
-    val postingResult: StateFlow<ExposurePostingResult?> = combine(_meterPoints, _posting) { points, posting ->
-        if (points.isEmpty()) null else calculatePosting(points, posting)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
-    val validPairs: StateFlow<List<ExposurePair>> = combine(postingResult, _evShift, rigContext) { result, shift, ctx ->
-        val target = result?.evShooting ?: return@combine emptyList()
-        calculatePairs(target + shift, ctx.apertures, ctx.shutters)
+    val validPairs: StateFlow<List<ExposurePair>> = combine(currentEv, activeProfile) { ev, profile ->
+        if (ev == null || profile == null) emptyList() else calculatePairs(ev, profile.apertures, profile.shutters)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val dof: StateFlow<DofResult?> = combine(validPairs, _selectedPairIndex, _focusDistanceM, rigContext) { pairs, index, distanceM, ctx ->
+    val dof: StateFlow<DofResult?> = combine(validPairs, _selectedPairIndex, _focusDistanceM, activeProfile) { pairs, index, distanceM, profile ->
         val pair = pairs.getOrNull(index) ?: return@combine null
+        val p = profile ?: return@combine null
         val aperture = parseList.apertureValue(pair.aperture) ?: return@combine null
-        calculateDof(ctx.focalMm, aperture, ctx.cocMm, distanceM * 1000f)
+        val coc = formatRepository.getAll().firstOrNull { it.id == p.formatId }?.coc ?: return@combine null
+        calculateDof(p.focalMm.toFloat(), aperture, coc, distanceM * 1000f)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    private suspend fun loadRigContext(rigId: Long?, filmId: String?): RigContext {
-        val rig = rigId?.let { rigRepository.getById(it) } ?: return RigContext.mock()
-        val format = formatRepository.getAll().firstOrNull { it.id == rig.formatId }
-        val film = filmId?.let { id -> filmRepository.getAll().firstOrNull { it.id == id } }
-        val mock = RigContext.mock()
-        return RigContext(
-            apertures = rig.activeApertures,
-            shutters = rig.activeSpeeds,
-            focalMm = rig.focal.toFloat(),
-            cocMm = format?.coc ?: mock.cocMm,
-            filmIso = film?.iso ?: mock.filmIso,
-            filmLatitudeMinus = film?.latitudeMinus ?: mock.filmLatitudeMinus,
-            filmLatitudePlus = film?.latitudePlus ?: mock.filmLatitudePlus,
-            isMock = false,
-        )
+    private var lastFrameProcessedAtMs = 0L
+
+    init {
+        // Смена Ev (сцена изменилась) — сбрасываем выбор пары на первую, иначе индекс может
+        // указывать на пару из уже неактуального набора.
+        viewModelScope.launch {
+            currentEv.distinctUntilChanged().collect { _selectedPairIndex.value = 0 }
+        }
     }
 
-    /** Ev точки замера по текущему кадру камеры + калибровке + ISO текущей (или мок-)плёнки. */
-    fun meterPointEv(frame: LuminanceFrame): Float {
+    /** Вызывается из UI при каждом новом кадре камеры (§8.1 — теперь непрерывно, без тапов). */
+    fun onLiveFrame(frame: LuminanceFrame) {
+        if (_isFrozen.value) return
+        val now = System.currentTimeMillis()
+        if (now - lastFrameProcessedAtMs < LIVE_UPDATE_THROTTLE_MS) return
+        lastFrameProcessedAtMs = now
+
+        val profile = activeProfile.value ?: return
         val bv = calculateBv.bv(
             signal = frame.averageLuminance,
             t0 = frame.exposureTimeSeconds,
@@ -113,36 +103,19 @@ class MainViewModel @Inject constructor(
             iso0 = frame.isoSensitivity,
             calibrationConstant = settings.value.calibrationConstant,
         )
-        return calculateBv.evAtFilmIso(bv, rigContext.value.filmIso)
+        _liveEv.value = calculateBv.evAtFilmIso(bv, profile.iso)
     }
 
     /**
-     * Тап по превью (§8.1). Тап рядом с существующим маркером — удаляет его (§7.7).
-     * 4-й тап при уже 3 точках — сброс и новый цикл (§8.1).
+     * "Зафиксировать" (бывшая пауза, §7.6): стопорит и кадр, и Ev, и пары одновременно.
+     * Возвращает новое состояние — UI по нему решает, звать ли CameraController.freeze()/unfreeze()
+     * (сама заморозка Bitmap — забота UI-слоя, ViewModel камеру не держит).
      */
-    fun onTap(x: Float, y: Float, ev: Float) {
-        val current = _meterPoints.value
-        val hit = current.firstOrNull { hypot((it.x - x).toDouble(), (it.y - y).toDouble()) < MARKER_HIT_RADIUS_PX }
-
-        _meterPoints.value = when {
-            hit != null -> current - hit
-            current.size >= 3 -> listOf(MeterPoint(x, y, ev, PointCategory.MID))
-            else -> current + MeterPoint(x, y, ev, PointCategory.MID)
-        }
-        _selectedPairIndex.value = 0
-    }
-
-    fun clearPoints() {
-        _meterPoints.value = emptyList()
-        _selectedPairIndex.value = 0
-    }
-
-    fun setPosting(mode: ExposurePosting) {
-        _posting.value = mode
-    }
-
-    fun setEvShift(shift: Float) {
-        _evShift.value = shift.coerceIn(-3f, 3f)
+    fun toggleFreeze(): Boolean {
+        val next = !_isFrozen.value
+        if (next) _frozenEv.value = _liveEv.value
+        _isFrozen.value = next
+        return next
     }
 
     fun selectPairIndex(index: Int) {
@@ -155,13 +128,5 @@ class MainViewModel @Inject constructor(
 
     fun toggleBW(value: Boolean) {
         viewModelScope.launch { settingsRepository.update { it.copy(isBW = value) } }
-    }
-
-    fun toggleScaleMode() {
-        viewModelScope.launch {
-            settingsRepository.update {
-                it.copy(scaleMode = if (it.scaleMode == ScaleMode.SIMPLE) ScaleMode.PRO else ScaleMode.SIMPLE)
-            }
-        }
     }
 }

@@ -10,32 +10,20 @@ import com.filmexposure.ui.calibration.CalibrationScreen
 import com.filmexposure.ui.main.MainScreen
 import com.filmexposure.ui.menu.MenuScreen
 import com.filmexposure.ui.menu.about.AboutScreen
-import com.filmexposure.ui.menu.catalog.CameraListScreen
-import com.filmexposure.ui.menu.catalog.CustomCameraScreen
-import com.filmexposure.ui.menu.catalog.CustomFilmScreen
-import com.filmexposure.ui.menu.catalog.CustomLensScreen
-import com.filmexposure.ui.menu.catalog.FilmListScreen
-import com.filmexposure.ui.menu.catalog.LensListScreen
-import com.filmexposure.ui.menu.rigs.RigEditorScreen
-import com.filmexposure.ui.menu.rigs.RigListScreen
+import com.filmexposure.ui.menu.profiles.ProfileEditorScreen
+import com.filmexposure.ui.menu.profiles.ProfileListScreen
 import com.filmexposure.ui.menu.settings.SettingsScreen
 
 private const val ROUTE_MAIN = "main"
 private const val ROUTE_MENU = "menu"
 private const val ROUTE_CALIBRATION = "calibration"
-private const val ROUTE_RIGS = "menu/rigs"
-private const val ROUTE_RIG_EDITOR = "menu/rigs/editor"
-private const val ARG_RIG_ID = "rigId"
-private const val ROUTE_CAMERAS = "menu/cameras"
-private const val ROUTE_CAMERA_NEW = "menu/cameras/new"
-private const val ROUTE_LENSES = "menu/lenses"
-private const val ROUTE_LENS_NEW = "menu/lenses/new"
-private const val ROUTE_FILMS = "menu/films"
-private const val ROUTE_FILM_NEW = "menu/films/new"
+private const val ROUTE_PROFILES = "menu/profiles"
+private const val ROUTE_PROFILE_EDITOR = "menu/profiles/editor"
+private const val ARG_PROFILE_ID = "profileId"
 private const val ROUTE_SETTINGS = "menu/settings"
 private const val ROUTE_ABOUT = "menu/about"
 
-/** Точка входа в UI — полный граф навигации §6.1–§6.4. */
+/** Точка входа в UI — граф навигации по модели "Профиль" (§6.2 упрощено до Профили/Настройки/О программе). */
 @Composable
 fun FilmExposureRoot() {
     val navController = rememberNavController()
@@ -48,10 +36,7 @@ fun FilmExposureRoot() {
         composable(ROUTE_MENU) {
             MenuScreen(
                 onBack = { navController.popBackStack() },
-                onOpenRigs = { navController.navigate(ROUTE_RIGS) },
-                onOpenCameras = { navController.navigate(ROUTE_CAMERAS) },
-                onOpenLenses = { navController.navigate(ROUTE_LENSES) },
-                onOpenFilms = { navController.navigate(ROUTE_FILMS) },
+                onOpenProfiles = { navController.navigate(ROUTE_PROFILES) },
                 onOpenSettings = { navController.navigate(ROUTE_SETTINGS) },
                 onOpenAbout = { navController.navigate(ROUTE_ABOUT) },
             )
@@ -61,44 +46,20 @@ fun FilmExposureRoot() {
             CalibrationScreen(onCalibrated = { navController.popBackStack() })
         }
 
-        composable(ROUTE_RIGS) {
-            RigListScreen(
+        composable(ROUTE_PROFILES) {
+            ProfileListScreen(
                 onBack = { navController.popBackStack() },
-                onCreateRig = { navController.navigate("$ROUTE_RIG_EDITOR?$ARG_RIG_ID=-1") },
-                onEditRig = { id -> navController.navigate("$ROUTE_RIG_EDITOR?$ARG_RIG_ID=$id") },
+                onCreateProfile = { navController.navigate("$ROUTE_PROFILE_EDITOR?$ARG_PROFILE_ID=-1") },
+                onEditProfile = { id -> navController.navigate("$ROUTE_PROFILE_EDITOR?$ARG_PROFILE_ID=$id") },
             )
         }
         composable(
-            route = "$ROUTE_RIG_EDITOR?$ARG_RIG_ID={$ARG_RIG_ID}",
-            arguments = listOf(navArgument(ARG_RIG_ID) { type = NavType.LongType; defaultValue = -1L }),
+            route = "$ROUTE_PROFILE_EDITOR?$ARG_PROFILE_ID={$ARG_PROFILE_ID}",
+            arguments = listOf(navArgument(ARG_PROFILE_ID) { type = NavType.LongType; defaultValue = -1L }),
         ) { entry ->
-            val rigId = entry.arguments?.getLong(ARG_RIG_ID)?.takeIf { it >= 0L }
-            RigEditorScreen(rigId = rigId, onBack = { navController.popBackStack() })
+            val profileId = entry.arguments?.getLong(ARG_PROFILE_ID)?.takeIf { it >= 0L }
+            ProfileEditorScreen(profileId = profileId, onBack = { navController.popBackStack() })
         }
-
-        composable(ROUTE_CAMERAS) {
-            CameraListScreen(
-                onBack = { navController.popBackStack() },
-                onAddCustom = { navController.navigate(ROUTE_CAMERA_NEW) },
-            )
-        }
-        composable(ROUTE_CAMERA_NEW) { CustomCameraScreen(onBack = { navController.popBackStack() }) }
-
-        composable(ROUTE_LENSES) {
-            LensListScreen(
-                onBack = { navController.popBackStack() },
-                onAddCustom = { navController.navigate(ROUTE_LENS_NEW) },
-            )
-        }
-        composable(ROUTE_LENS_NEW) { CustomLensScreen(onBack = { navController.popBackStack() }) }
-
-        composable(ROUTE_FILMS) {
-            FilmListScreen(
-                onBack = { navController.popBackStack() },
-                onAddCustom = { navController.navigate(ROUTE_FILM_NEW) },
-            )
-        }
-        composable(ROUTE_FILM_NEW) { CustomFilmScreen(onBack = { navController.popBackStack() }) }
 
         composable(ROUTE_SETTINGS) {
             SettingsScreen(

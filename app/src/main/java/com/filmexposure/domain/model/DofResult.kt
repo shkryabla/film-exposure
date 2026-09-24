@@ -12,21 +12,11 @@ data class DofResult(
     val total: Float,
 )
 
-/**
- * Валидная пара диафрагма/выдержка под текущий риг, с посчитанной ГРИП для выбранной дистанции.
- */
+/** Валидная пара диафрагма/выдержка под текущий Ev, с посчитанной ГРИП для выбранной дистанции. */
 data class ExposurePair(
     val aperture: String,
     val shutter: String,
     val av: Float,
     val tv: Float,
     val dof: DofResult?,
-)
-
-/** Точка замера экспозиции на превью камеры (ТЗ §4.5, §8.1). */
-data class MeterPoint(
-    val x: Float,
-    val y: Float,
-    val ev: Float,
-    val category: PointCategory,
 )
