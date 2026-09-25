@@ -84,7 +84,7 @@ class MainViewModel @Inject constructor(
         // Смена Ev (сцена изменилась) — сбрасываем выбор пары на первую, иначе индекс может
         // указывать на пару из уже неактуального набора.
         viewModelScope.launch {
-            currentEv.distinctUntilChanged().collect { _selectedPairIndex.value = 0 }
+            currentEv.collect { _selectedPairIndex.value = 0 }
         }
     }
 
