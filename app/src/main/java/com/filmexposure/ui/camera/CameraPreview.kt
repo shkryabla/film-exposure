@@ -1,5 +1,4 @@
 package com.filmexposure.ui.camera
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
 /**
  * Создаёт [CameraController] на время жизни компоновки и биндит/анбиндит его к жизненному циклу
  * текущего LifecycleOwner (экран уходит с композиции → камера освобождается для других экранов/приложений).
@@ -30,15 +28,12 @@ fun rememberCameraController(): CameraController {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val controller = remember { CameraController(context) }
-
     DisposableEffect(lifecycleOwner) {
         controller.bind(lifecycleOwner)
         onDispose { controller.unbind() }
     }
-
     return controller
 }
-
 /**
  * Превью камеры (§7.1). Живой поток или замороженный Bitmap — переключается снаружи через
  * [CameraController.freeze]/[unfreeze]. Оверлеи (сетка третей, маркеры, крестик — §7.2, §7.7)
@@ -47,7 +42,6 @@ fun rememberCameraController(): CameraController {
 @Composable
 fun CameraPreview(controller: CameraController, isBW: Boolean = false, modifier: Modifier = Modifier) {
     val frozenBitmap by controller.frozenBitmap.collectAsStateWithLifecycle()
-
     Box(modifier = modifier.fillMaxSize().grayscale(isBW)) {
         val bitmap = frozenBitmap
         if (bitmap != null) {
@@ -64,7 +58,6 @@ fun CameraPreview(controller: CameraController, isBW: Boolean = false, modifier:
         }
     }
 }
-
 /**
  * ЧБ-эффект (§7.9). AndroidView (живой поток CameraX) не поддерживает Compose ColorFilter
  * напрямую — обходной путь через saveLayer с Paint.colorFilter, единственный способ применить
@@ -74,7 +67,6 @@ fun CameraPreview(controller: CameraController, isBW: Boolean = false, modifier:
 private val GRAYSCALE_PAINT = Paint().apply {
     colorFilter = androidx.compose.ui.graphics.ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
 }
-
 private fun Modifier.grayscale(enabled: Boolean): Modifier {
     if (!enabled) return this
     return this.graphicsLayer(alpha = 0.99f).drawWithContent {

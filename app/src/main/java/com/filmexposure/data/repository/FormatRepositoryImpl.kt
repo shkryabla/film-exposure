@@ -1,16 +1,13 @@
 package com.filmexposure.data.repository
-
 import com.filmexposure.domain.model.FilmFormat
 import com.filmexposure.domain.repository.FormatRepository
 import javax.inject.Inject
-
 /**
  * Форматы кадра — небольшой захардкоженный список физических констант (CoC для ГРИП), не БД
  * и не JSON-справочник (решение по проекту при переходе на Профили).
  */
 class FormatRepositoryImpl @Inject constructor() : FormatRepository {
     override fun getAll(): List<FilmFormat> = FORMATS
-
     companion object {
         private val FORMATS = listOf(
             FilmFormat(id = "35mm", name = "35 мм", widthMm = 36f, heightMm = 24f, coc = 0.029f),

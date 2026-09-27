@@ -1,5 +1,4 @@
 package com.filmexposure.ui.menu
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-
 /** Меню (§6.2) — теперь три секции: Профили, Настройки, О программе. */
 @Composable
 fun MenuScreen(
@@ -47,7 +45,6 @@ fun MenuScreen(
         }
     }
 }
-
 @Composable
 private fun MenuRow(title: String, icon: ImageVector, onClick: () -> Unit) {
     ListItem(

@@ -1,15 +1,12 @@
 package com.filmexposure.ui.main
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
@@ -26,20 +23,26 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.filmexposure.domain.model.ButtonSide
+import com.filmexposure.domain.model.FocusDistanceStops
 import com.filmexposure.ui.camera.CameraPermissionGate
 import com.filmexposure.ui.camera.CameraPreview
 import com.filmexposure.ui.camera.rememberCameraController
 import com.filmexposure.ui.main.components.BwToggle
-import com.filmexposure.ui.main.components.DistanceScale
+import com.filmexposure.ui.main.components.DofResultText
 import com.filmexposure.ui.main.components.ExposureDial
 import com.filmexposure.ui.main.components.FixSceneButton
+import com.filmexposure.ui.main.components.FocusDistanceSlider
+import com.filmexposure.ui.main.components.IsoSelector
 import com.filmexposure.ui.theme.glassPanel
-
 /**
- * Главный экран-экспонометр — целиком переписан под модель "Профиль" и непрерывный живой замер
- * (решение по проекту, см. обсуждение упрощения). Живой поток с камеры анализируется постоянно
- * (LuminanceAnalyzer), MainViewModel.onLiveFrame пересчитывает Ev не чаще раза в ~200мс;
- * "Зафиксировать" стопорит кадр+Ev+пары одновременно.
+ * Главный экран-экспонометр. Живой поток с камеры анализируется постоянно (LuminanceAnalyzer),
+ * MainViewModel.onLiveFrame пересчитывает Ev не чаще раза в ~200мс; "Зафиксировать" стопорит
+ * кадр+Ev+пары одновременно.
+ *
+ * ГРИП (решение по проекту, отменяет старую боковую панель): считается и показывается текстом по
+ * центру ТОЛЬКО когда пользователь тапнул конкретную пару в ExposureDial; прокрутка/просмотр
+ * пар сама по себе ГРИП не запускает. Дистанция фокусировки — отдельный линейный слайдер с
+ * динамическим шагом (FocusDistanceStops), работает независимо от выбора пары.
  */
 @Composable
 fun MainScreen(onOpenMenu: () -> Unit, viewModel: MainViewModel = hiltViewModel()) {
@@ -50,33 +53,34 @@ fun MainScreen(onOpenMenu: () -> Unit, viewModel: MainViewModel = hiltViewModel(
         val isFrozen by viewModel.isFrozen.collectAsStateWithLifecycle()
         val validPairs by viewModel.validPairs.collectAsStateWithLifecycle()
         val selectedPairIndex by viewModel.selectedPairIndex.collectAsStateWithLifecycle()
-        val focusDistanceM by viewModel.focusDistanceM.collectAsStateWithLifecycle()
+        val focusDistanceIndex by viewModel.focusDistanceIndex.collectAsStateWithLifecycle()
         val dof by viewModel.dof.collectAsStateWithLifecycle()
-
         val frame by controller.frame.collectAsStateWithLifecycle()
         LaunchedEffect(frame) { frame?.let { viewModel.onLiveFrame(it) } }
-
         Box(modifier = Modifier.fillMaxSize()) {
             CameraPreview(controller, isBW = settings.isBW, modifier = Modifier.fillMaxSize())
-
-            // Верхняя панель — прозрачная, поверх живого кадра.
+            // Верхняя панель — прозрачная, поверх живого кадра. ISO — под иконкой ЧБ (решение по проекту).
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                val bwToggle: @Composable () -> Unit = { BwToggle(settings.isBW, viewModel::toggleBW) }
+                val bwAndIso: @Composable () -> Unit = {
+                    Column(horizontalAlignment = Alignment.Start) {
+                        BwToggle(settings.isBW, viewModel::toggleBW)
+                        IsoSelector(currentIso = settings.filmIso, onIsoSelected = viewModel::setFilmIso)
+                    }
+                }
                 val menuButton: @Composable () -> Unit = {
                     IconButton(onClick = onOpenMenu) {
                         Icon(Icons.Filled.Menu, contentDescription = "Меню", tint = Color.White)
                     }
                 }
                 if (settings.pauseButtonSide == ButtonSide.LEFT) {
-                    menuButton(); bwToggle()
+                    menuButton(); bwAndIso()
                 } else {
-                    bwToggle(); menuButton()
+                    bwAndIso(); menuButton()
                 }
             }
-
             if (activeProfile == null) {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -95,46 +99,48 @@ fun MainScreen(onOpenMenu: () -> Unit, viewModel: MainViewModel = hiltViewModel(
                     }
                 }
             }
-
-            // ГРИП-панель — справа (или слева при pauseButtonSide=LEFT).
-            DistanceScale(
-                distanceM = focusDistanceM,
-                onDistanceChange = viewModel::setFocusDistanceM,
-                dof = dof,
-                unit = settings.distanceUnit,
-                modifier = Modifier
-                    .align(if (settings.pauseButtonSide == ButtonSide.LEFT) Alignment.CenterStart else Alignment.CenterEnd)
-                    .padding(12.dp)
-                    .width(76.dp)
-                    .fillMaxHeight(0.55f),
-            )
-
-            // Нижняя панель — катушки пар + кнопка фиксации.
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            // Текст ГРИП — по центру экрана, только когда пара выбрана явным тапом.
+            dof?.let {
+                DofResultText(
+                    dof = it,
+                    unit = settings.distanceUnit,
+                    modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                )
+            }
+            // Нижний блок — слайдер дистанции, катушки пар, кнопка фиксации.
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                ExposureDial(
-                    pairs = validPairs,
-                    selectedIndex = selectedPairIndex,
-                    onSelect = viewModel::selectPairIndex,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(96.dp)
-                        .glassPanel()
-                        .padding(vertical = 4.dp),
+                FocusDistanceSlider(
+                    stops = FocusDistanceStops.METERS,
+                    selectedIndex = focusDistanceIndex,
+                    onIndexChanged = viewModel::setFocusDistanceIndex,
+                    unit = settings.distanceUnit,
+                    modifier = Modifier.fillMaxWidth(),
                 )
-                FixSceneButton(
-                    isFrozen = isFrozen,
-                    onToggle = {
-                        val nowFrozen = viewModel.toggleFreeze()
-                        if (nowFrozen) controller.freeze() else controller.unfreeze()
-                    },
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    ExposureDial(
+                        pairs = validPairs,
+                        selectedIndex = selectedPairIndex,
+                        onSelect = viewModel::selectPairIndex,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(96.dp)
+                            .glassPanel()
+                            .padding(vertical = 4.dp),
+                    )
+                    FixSceneButton(
+                        isFrozen = isFrozen,
+                        onToggle = {
+                            val nowFrozen = viewModel.toggleFreeze()
+                            if (nowFrozen) controller.freeze() else controller.unfreeze()
+                        },
+                    )
+                }
             }
         }
     }

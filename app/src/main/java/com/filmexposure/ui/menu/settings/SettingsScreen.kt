@@ -1,5 +1,4 @@
 package com.filmexposure.ui.menu.settings
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,7 +29,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.filmexposure.domain.model.ButtonSide
 import com.filmexposure.domain.model.DistanceUnit
-
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
@@ -38,7 +36,6 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -59,7 +56,6 @@ fun SettingsScreen(
                 onSelect = viewModel::setDistanceUnit,
             )
             HorizontalDivider()
-
             SectionLabel("Сторона кнопки \"Зафиксировать\"")
             SingleChoiceRow(
                 options = ButtonSide.entries,
@@ -68,7 +64,6 @@ fun SettingsScreen(
                 onSelect = viewModel::setPauseButtonSide,
             )
             HorizontalDivider()
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -77,7 +72,6 @@ fun SettingsScreen(
                 Text("Чёрно-белое превью", style = MaterialTheme.typography.bodyLarge)
                 Switch(checked = settings.isBW, onCheckedChange = viewModel::setBW)
             }
-
             HorizontalDivider()
             SectionLabel("Калибровка")
             Text(
@@ -95,12 +89,10 @@ fun SettingsScreen(
         }
     }
 }
-
 @Composable
 private fun SectionLabel(text: String) {
     Text(text, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
 }
-
 @Composable
 private fun <T> SingleChoiceRow(options: List<T>, selected: T, label: (T) -> String, onSelect: (T) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth()) {

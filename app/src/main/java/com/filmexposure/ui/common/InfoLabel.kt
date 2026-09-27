@@ -1,5 +1,4 @@
 package com.filmexposure.ui.common
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -18,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
 /**
  * Подпись поля + значок (i), раскрывающий объяснение термина (например "МДФ — что это?").
  * Использовать вместо голого Text(label) там, где название поля — непонятный новичку жаргон.
@@ -26,7 +24,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun InfoLabel(label: String, explanation: String, modifier: Modifier = Modifier) {
     var showDialog by remember { mutableStateOf(false) }
-
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(label, style = MaterialTheme.typography.titleSmall)
         IconButton(onClick = { showDialog = true }, modifier = Modifier.size(28.dp)) {
@@ -38,7 +35,6 @@ fun InfoLabel(label: String, explanation: String, modifier: Modifier = Modifier)
             )
         }
     }
-
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },

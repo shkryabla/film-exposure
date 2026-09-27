@@ -1,5 +1,4 @@
 package com.filmexposure.ui.calibration
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +24,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.filmexposure.ui.camera.CameraPermissionGate
 import com.filmexposure.ui.camera.CameraPreview
 import com.filmexposure.ui.camera.rememberCameraController
-
 /** Эталонный Ev по правилу "Солнце-16": ISO100, f/16, 1/125 в ясный полдень. Точность ±1 стоп. */
 private const val SUNNY_16_EV = 15f
-
 private enum class CalibrationStep { PICKER, SUNNY16, MANUAL }
-
 /**
  * Калибровка (§4.2) — НЕОБЯЗАТЕЛЬНАЯ (решение по проекту, пересмотрено после обсуждения C):
  * без неё используется разумный дефолт (AppSettings.DEFAULT_CALIBRATION_CONSTANT), приложение
@@ -43,7 +39,6 @@ fun CalibrationScreen(
     viewModel: CalibrationViewModel = hiltViewModel(),
 ) {
     var step by remember { mutableStateOf(CalibrationStep.PICKER) }
-
     when (step) {
         CalibrationStep.PICKER -> PickerContent(
             onPickSunny16 = { step = CalibrationStep.SUNNY16 },
@@ -71,7 +66,6 @@ fun CalibrationScreen(
         )
     }
 }
-
 @Composable
 private fun PickerContent(onPickSunny16: () -> Unit, onPickManual: () -> Unit, onSkip: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
@@ -91,7 +85,6 @@ private fun PickerContent(onPickSunny16: () -> Unit, onPickManual: () -> Unit, o
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
             )
-
             Button(onClick = onPickSunny16, modifier = Modifier.fillMaxWidth()) {
                 Text("Sunny-16 — ясный день, точность ±1 стоп")
             }
@@ -104,7 +97,6 @@ private fun PickerContent(onPickSunny16: () -> Unit, onPickManual: () -> Unit, o
         }
     }
 }
-
 /** Общий сценарий и для Sunny-16 (referenceEv фиксирован), и для ручного ввода (referenceEv вводится). */
 @Composable
 private fun MeasureContent(
@@ -118,17 +110,14 @@ private fun MeasureContent(
     CameraPermissionGate {
         val controller = rememberCameraController()
         val frame by controller.frame.collectAsStateWithLifecycle()
-
         var measuredBv by remember { mutableStateOf<Float?>(null) }
         var manualInput by remember { mutableStateOf("") }
         val referenceEv = fixedReferenceEv ?: manualInput.toFloatOrNull()
-
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Box(modifier = Modifier.weight(1f)) {
                     CameraPreview(controller, modifier = Modifier.fillMaxSize())
                 }
-
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                     Text(
@@ -137,14 +126,12 @@ private fun MeasureContent(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
                     )
-
                     Button(
                         onClick = { frame?.let { measuredBv = viewModel.measureUncalibratedBv(it) } },
                         enabled = frame != null,
                     ) {
                         Text(if (frame == null) "Ждём кадр камеры…" else "Замерить")
                     }
-
                     measuredBv?.let { bv ->
                         Text(
                             text = "Замер без калибровки: Bv ≈ ${"%.2f".format(bv)}",
@@ -153,7 +140,6 @@ private fun MeasureContent(
                             modifier = Modifier.padding(top = 8.dp),
                         )
                     }
-
                     if (fixedReferenceEv == null) {
                         OutlinedTextField(
                             value = manualInput,
@@ -163,7 +149,6 @@ private fun MeasureContent(
                             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                         )
                     }
-
                     Button(
                         onClick = {
                             val bv = measuredBv
@@ -175,7 +160,6 @@ private fun MeasureContent(
                     ) {
                         Text("Сохранить и продолжить")
                     }
-
                     TextButton(onClick = onBack, modifier = Modifier.padding(top = 4.dp)) {
                         Text("Назад")
                     }

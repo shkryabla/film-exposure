@@ -1,5 +1,4 @@
 package com.filmexposure
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +8,6 @@ import com.filmexposure.ui.theme.FilmExposureTheme
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.ui.platform.LocalLifecycleOwner as ComposeUiLocalLifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner as LifecycleComposeLocalLifecycleOwner
-
 /**
  * Точка входа приложения. Реальный контент — в FilmExposureRoot (Navigation Compose):
  * калибровка → основной экран. Разрешение камеры запрашивается на экране,

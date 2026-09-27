@@ -1,5 +1,4 @@
 package com.filmexposure.ui.camera
-
 import android.Manifest
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
-
 /**
  * Единственное место в приложении, где запрашивается CAMERA-разрешение (ТЗ §17 — вход в
  * приложение не должен требовать разрешений заранее; запрашиваем только там, где оно реально
@@ -26,13 +24,11 @@ import com.google.accompanist.permissions.rememberPermissionState
 @Composable
 fun CameraPermissionGate(content: @Composable () -> Unit) {
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA)
-
     LaunchedEffect(Unit) {
         if (permissionState.status !is PermissionStatus.Granted) {
             permissionState.launchPermissionRequest()
         }
     }
-
     when (val status = permissionState.status) {
         is PermissionStatus.Granted -> content()
         is PermissionStatus.Denied -> DeniedContent(
@@ -41,7 +37,6 @@ fun CameraPermissionGate(content: @Composable () -> Unit) {
         )
     }
 }
-
 @Composable
 private fun DeniedContent(shouldShowRationale: Boolean, onRequest: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {

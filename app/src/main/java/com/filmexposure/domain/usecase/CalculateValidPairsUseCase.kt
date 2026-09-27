@@ -1,10 +1,8 @@
 package com.filmexposure.domain.usecase
-
 import com.filmexposure.domain.model.ApexValues
 import com.filmexposure.domain.model.ExposurePair
 import javax.inject.Inject
 import kotlin.math.abs
-
 /**
  * Все пары диафрагма/выдержка из АКТИВНОГО набора рига, дающие targetEv (§7.4: "только пары,
  * дающие нужный Ev"). Разные пары могут давать один и тот же Ev за счёт взаимозаместимости
@@ -20,7 +18,6 @@ import kotlin.math.abs
 class CalculateValidPairsUseCase @Inject constructor(
     private val parseList: ParseTechnicalListUseCase,
 ) {
-
     operator fun invoke(
         targetEv: Float,
         apertureLabels: List<String>,
@@ -33,7 +30,6 @@ class CalculateValidPairsUseCase @Inject constructor(
         val shutters = shutterLabels.mapNotNull { label ->
             parseList.shutterSeconds(label)?.let { label to it }
         }
-
         val pairs = mutableListOf<ExposurePair>()
         for ((apertureLabel, n) in apertures) {
             val av = ApexValues.av(n)

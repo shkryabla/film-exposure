@@ -1,5 +1,4 @@
 package com.filmexposure.ui.menu.profiles
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
 /** Список профилей (§6.2 "Профили"). Тап по карточке — выбрать для съёмки; карандаш/корзина — редактировать/удалить. */
 @Composable
 fun ProfileListScreen(
@@ -43,7 +41,6 @@ fun ProfileListScreen(
 ) {
     val profiles by viewModel.profiles.collectAsStateWithLifecycle()
     val selectedId by viewModel.selectedProfileId.collectAsStateWithLifecycle()
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -70,7 +67,6 @@ fun ProfileListScreen(
             }
             return@Scaffold
         }
-
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
             items(profiles, key = { it.id }) { profile ->
                 val isSelected = profile.id == selectedId
@@ -112,7 +108,7 @@ fun ProfileListScreen(
                             }
                         }
                         Text(
-                            "ISO ${profile.iso} · ${profile.focalMm} мм · ${profile.apertures.size} диафрагм · ${profile.shutters.size} выдержек",
+                            "${profile.focalMm} мм · диафрагмы: ${profile.apertureSeries.name} · выдержки: ${profile.shutterSeries.name}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

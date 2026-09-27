@@ -1,5 +1,4 @@
 package com.filmexposure.ui.camera
-
 import android.content.Context
 import android.graphics.Bitmap
 import android.hardware.camera2.CameraCaptureSession
@@ -18,7 +17,6 @@ import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.concurrent.Executors
-
 /**
  * Биндинг CameraX (Preview + ImageAnalysis) к жизненному циклу + чтение реальных параметров
  * экспозиции телефона через Camera2Interop (t0/N0/ISO0 — §4.2). См. предупреждение в
@@ -28,14 +26,11 @@ import java.util.concurrent.Executors
  * так как ему нужен Context конкретного экрана и PreviewView, а не singleton-граф.
  */
 class CameraController(private val context: Context) {
-
     private val cameraExecutor = Executors.newSingleThreadExecutor()
-
     @Volatile private var latestLuminance: Float = 0f
     @Volatile private var latestExposureTimeNanos: Long = 0L
     @Volatile private var latestIso: Int = 0
     @Volatile private var latestAperture: Float = 0f
-
     // COMPATIBLE (TextureView) вместо дефолтного PERFORMANCE (SurfaceView): PreviewView лежит
     // в Compose-стеке вместе с оверлеями (сетка, маркеры, крестик) и ЧБ-эффектом через saveLayer —
     // SurfaceView рендерится отдельным аппаратным оверлеем в обход обычной композиции и даёт
@@ -44,26 +39,20 @@ class CameraController(private val context: Context) {
     val previewView: PreviewView by lazy {
         PreviewView(context).apply { implementationMode = PreviewView.ImplementationMode.COMPATIBLE }
     }
-
     private val _frame = MutableStateFlow<LuminanceFrame?>(null)
     val frame: StateFlow<LuminanceFrame?> = _frame
-
     private val _frozenBitmap = MutableStateFlow<Bitmap?>(null)
     val frozenBitmap: StateFlow<Bitmap?> = _frozenBitmap
-
     @OptIn(ExperimentalCamera2Interop::class)
     fun bind(lifecycleOwner: LifecycleOwner) {
         val providerFuture = ProcessCameraProvider.getInstance(context)
         providerFuture.addListener({
             val provider = providerFuture.get()
-
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
-
             val analysisBuilder = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-
             Camera2Interop.Extender(analysisBuilder).setSessionCaptureCallback(
                 object : CameraCaptureSession.CaptureCallback() {
                     override fun onCaptureCompleted(
@@ -78,7 +67,6 @@ class CameraController(private val context: Context) {
                     }
                 },
             )
-
             val analysis = analysisBuilder.build().also {
                 it.setAnalyzer(
                     cameraExecutor,
@@ -88,26 +76,21 @@ class CameraController(private val context: Context) {
                     },
                 )
             }
-
             provider.unbindAll()
             provider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
         }, ContextCompat.getMainExecutor(context))
     }
-
     fun unbind() {
         runCatching { ProcessCameraProvider.getInstance(context).get().unbindAll() }
         cameraExecutor.shutdown()
     }
-
     /** Заморозка превью (§7.1, §7.6): берём текущий кадр PreviewView как статичный Bitmap. */
     fun freeze() {
         _frozenBitmap.value = previewView.bitmap
     }
-
     fun unfreeze() {
         _frozenBitmap.value = null
     }
-
     private fun pushFrame() {
         val t0 = latestExposureTimeNanos
         val iso0 = latestIso

@@ -1,5 +1,4 @@
 package com.filmexposure.ui.main.components
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MonochromePhotos
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -9,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-
 /**
  * Переключатель ЧБ — иконка вместо ползунка (решение по проекту при упрощении экрана).
  * MonochromePhotos — однозначно читается как "чёрно-белый режим", в отличие от нейтрального
